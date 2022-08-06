@@ -1,0 +1,22 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity PIPORegister is
+    Port ( I : in  STD_LOGIC_VECTOR (1 downto 0);
+           Load : in  STD_LOGIC;
+           O : out  STD_LOGIC_VECTOR (1 downto 0));
+end PIPORegister;
+
+architecture Behavioral of PIPORegister is
+
+component DLatch
+    Port ( D : in  STD_LOGIC;
+           En : in  STD_LOGIC;
+           Q : out  STD_LOGIC;
+           Qn : out  STD_LOGIC);
+end component;
+Signal K : STD_LOGIC_VECTOR (1 downto 0);
+begin
+D0: DLatch port map(I(0),Load,O(0),K(0));
+D1: DLatch port map(I(1),Load,O(1),K(1));
+end Behavioral;

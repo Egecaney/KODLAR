@@ -1,0 +1,44 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity AU is
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           B : in  STD_LOGIC_VECTOR (1 downto 0);
+           S : in  STD_LOGIC_VECTOR (2 downto 0);
+           O : out  STD_LOGIC_VECTOR (2 downto 0));
+end AU;
+
+architecture Behavioral of AU is
+
+component Comparator
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           B : in  STD_LOGIC_VECTOR (1 downto 0);
+           GEL : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
+component AdderSubs
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           B : in  STD_LOGIC_VECTOR (1 downto 0);
+           M : in  STD_LOGIC;
+           S : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
+component MUX4TO1
+    Port ( Z : in  STD_LOGIC_VECTOR (2 downto 0);
+           Y : in  STD_LOGIC_VECTOR (2 downto 0);
+           X : in  STD_LOGIC_VECTOR (2 downto 0);
+           W : in  STD_LOGIC_VECTOR (2 downto 0);
+           S : in  STD_LOGIC_VECTOR (1 downto 0);
+           F : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+Signal K,L,M,N :  STD_LOGIC_VECTOR (2 downto 0);
+signal P : STD_LOGIC_VECTOR (1 downto 0);
+begin
+ADD : AdderSubs port map (A,B,'0',K);
+SUBS : AdderSubs port map (A,B,'1',L);
+ADD1 : AdderSubs port map (A,"01",'0',M);
+COMP : Comparator port map (A,B,N);
+P(0) <= S(0);
+P(1) <= S(1);
+MUX : MUX4TO1 port map(K,L,M,N,P,O);
+end Behavioral;

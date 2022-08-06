@@ -1,0 +1,54 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity ArithmeticLogicUnit is
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           S : in  STD_LOGIC_VECTOR (2 downto 0);
+           Load : in  STD_LOGIC;
+	   TA : out STD_LOGIC_VECTOR (1 downto 0);
+	   TB : out STD_LOGIC_VECTOR (1 downto 0);
+           O : out  STD_LOGIC_VECTOR (2 downto 0));
+end ArithmeticLogicUnit;
+
+architecture Behavioral of ArithmeticLogicUnit is
+
+component AU
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           B : in  STD_LOGIC_VECTOR (1 downto 0);
+           S : in  STD_LOGIC_VECTOR (2 downto 0);
+           O : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
+component LU
+    Port ( A : in  STD_LOGIC_VECTOR (1 downto 0);
+           B : in  STD_LOGIC_VECTOR (1 downto 0);
+           S : in  STD_LOGIC_VECTOR (2 downto 0);
+           T : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
+component PIPORegister
+    Port ( I : in  STD_LOGIC_VECTOR (1 downto 0);
+           Load : in  STD_LOGIC;
+           O : out  STD_LOGIC_VECTOR (1 downto 0));
+end component;
+
+component MUX
+    Port ( A : in  STD_LOGIC_VECTOR (2 downto 0);
+           B : in  STD_LOGIC_VECTOR (2 downto 0);
+           S : in  STD_LOGIC;
+           O : out  STD_LOGIC_VECTOR (2 downto 0));
+end component;
+
+Signal T1,T2 : STD_LOGIC_VECTOR (1 downto 0);
+Signal T3,T4 : STD_LOGIC_VECTOR (2 downto 0);
+
+begin
+PIPO0 : PIPORegister port map(A,Load,T1);
+PIPO1 : PIPORegister port map(A,NOT Load,T2);
+TA <= T1;
+TB <= T2;
+
+AUT : AU port map(T1,T2,S,T3);
+LUT : LU port map(T1,T2,S,T4);
+MUXİ : MUX port map(T4,T3,S(2),O);
+end Behavioral;

@@ -1,0 +1,23 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity DLatch is
+    Port ( D : in  STD_LOGIC;
+           En : in  STD_LOGIC;
+           Q : out  STD_LOGIC;
+           Qn : out  STD_LOGIC);
+end DLatch;
+
+architecture Behavioral of DLatch is
+signal T1,T2,T3,T4 : STD_LOGIC;
+begin
+
+T1 <= D nand En ;
+T2 <= (not D) nand En ;
+T3 <= T2 nand T4 ;
+T4 <= T1 nand T3;
+
+Q <= T1 nand T3;
+Qn <= T2 nand T4 ;
+
+end Behavioral;
