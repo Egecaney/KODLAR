@@ -1,0 +1,47 @@
+#include <msp430.h>
+#define ENABLE_PINS 0xFFFE                     // Required to use inputs and outputs
+#define ACLK 0x0100                            // Timer_A ACLK source
+#define CONTINUOUS 0x0020                      // Continuous mode this time
+main()
+{
+ WDTCTL = WDTPW | WDTHOLD;                     // Stop WDT
+ PM5CTL0 = ENABLE_PINS;                        // Enable inputs and outputs
+ P1DIR = BIT0 | BIT5;                          // P1.0, P1.5 will be outputs
+ P9DIR = BIT7;                                 // P9.7 will be an output
+ TA0CCTL0 = CCIE;                              // Enable Timer0 CCR0 interrupt
+ TA0CCTL1 = CCIE;                              // Enable Timer0 CCR1 interrupt
+ TA0CCTL2 = CCIE;                              // Enable Timer0 CCR2 interrupt
+ TA0CCR0 = 7000;                               // Every 7,000 counts --> CCR0 ISR
+ TA0CCR1 = 33000;                              // Every 33,000 counts --> CCR1 ISR
+ TA0CCR2 = 44000;                              // Every 44,000 counts --> CCR2 ISR
+ TA0CTL = ACLK | CONTINUOUS;                   // Need CONTINUOUS mode for doing this,
+                                               // UP will not give you correct times
+ _BIS_SR(GIE);                                 // Active all three enabled interrupts
+ while(1);
+}
+
+// Timer0 TA0CCR0 Interrupt Service Routine
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void Timer0_CCR0_MATCH(void){
+ P9OUT = P9OUT ^ BIT7;                        // Toggle P9.7 green LED every 7,000 counts
+ TA0CCR0 = TA0CCR0 + 7000;                    // Update TA0CCR0 to reflect next match
+}
+
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void Timer0_CCR1_AND_CCR2_MATCH(void){
+ switch(TA0IV){                               // This register will tell us if there is a match with TA0CCR1 or TA0CCR2
+                                            
+ case 2:                                      // Do this for TA0CCR1 match
+ {                                            // "2" refers to TA0CCR1
+ P1OUT = P1OUT ^ BIT5;                        // Toggle P1.5
+ TA0CCR1 = TA0CCR1 + 33000;                   // Generate next interrupt in 33K counts
+ break;                                       // Leave ISR immediately
+ }
+ case 4:                                      // Do this for TA0CCR2 match
+ {                                            // "4" refers to TA0CCR2
+ P1OUT = P1OUT ^ BIT0;                        // Toggle P1.0
+ TA0CCR2 = TA0CCR2 + 44000;                   // Generate next interrupt in 50K counts
+ break; // Leave ISR immediately
+ }
+ }                                            // end switch statement
+}                                             //end ISR

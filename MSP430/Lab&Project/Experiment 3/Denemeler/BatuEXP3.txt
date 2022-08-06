@@ -1,0 +1,40 @@
+#include <msp430.h>
+
+
+int Counter = 1000;
+int up = 1;
+
+void main(void) {
+    WDTCTL = WDTPW + WDTHOLD;
+
+    P1DIR |= BIT6;
+
+    P1SEL |= BIT6;
+
+    CCTL0 = CCIE;
+    CCR0 = 1000;
+    CCTL1 = OUTMOD_3;
+    CCR1 = 1000;
+    TACTL = TASSEL_2 + MC_1 + ID_3;
+
+    _bis_SR_register(LPM0_bits + GIE);
+}
+
+
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void Timer_A (void) {
+
+ if( up )
+ Counter = Counter - 5;
+ else
+ Counter = Counter + 5;
+ //_delay_cycles(200000);
+ CCR1 = Counter;
+ if( Counter <= 0 )
+ up = 0;
+ if( Counter >= 1000 )
+ up = 1;
+
+
+}
+*/

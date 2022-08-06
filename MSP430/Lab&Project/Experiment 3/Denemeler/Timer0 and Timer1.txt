@@ -1,0 +1,58 @@
+#include <msp430.h>
+#define PET_WATCHDOG 0x5A08                // Pets the watchdog timer
+#define ACLK 0x0100                        // Timer_A ACLK source
+#define UP 0x0010                          // Timer_A UP mode
+#define ENABLE_PINS 0xFFFE                 // Required to use inputs and outputs
+void init_pins (void);
+void setup_timer0 (void);
+void setup_timer1 (void);
+main()
+{
+ init_pins();                               // Initializes input and output pins
+ setup_timer0();                            // Counts 1 second for red LED
+ setup_timer1();                            // Counts 10ms for watchdog timer
+ _BIS_SR(GIE);                              // Activate interrupts previously enabled
+ while(1)                                   // Keep looping forever
+ {
+ while((BIT1 & P1IN) == 0)                  // Is P1.1 button pushed?
+ {
+ P9OUT = BIT7;                              // Turn on the green LED (P9.7)
+ }
+ P9OUT = 0x00;                              // Turn off the green LED (P9.7)
+ }
+}
+
+// Timer0 Interrupt Service Routine
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void Timer0_ISR (void){
+ P1OUT = P1OUT ^ BIT0;                // Toggle red LED on P1.0
+}
+
+// Timer1 Interrupt Service Routine
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt void Timer1_ISR (void){
+ WDTCTL = PET_WATCHDOG;               // Otherwise, program starts over
+}
+
+void init_pins(void){
+ PM5CTL0 = ENABLE_PINS;               // Required to use inputs and outputs
+ P9DIR = BIT7;                        // Green LED is on Port 9, bit 7 (P9.7)
+ P1DIR = BIT0;                        // Ensure P1.1 button is an input and
+                                      // P1.0 is an output
+ P1OUT = BIT1;                        // P1.1 button needs a pull-up resistor
+ P1REN = BIT1;
+}
+
+// setup_timer0() function definition
+void setup_timer0 (void){
+ TA0CCR0 = 40000;                     // 40000 * 25us = 1000000us = 1second
+ TA0CTL = ACLK + UP;                  // Set ACLK, UP mode
+ TA0CCTL0 = CCIE;                     // Enable interrupt for Timer_0
+}
+
+// setup_timer1() function definition
+void setup_timer1 (void){
+ TA1CCR0 = 400;                       // 400 * 25us = 10000us = 0.01second
+ TA1CTL = ACLK + UP;                  // Set ACLK, UP mode
+ TA1CCTL0 = CCIE;                     // Enable interrupt for Timer_1
+}
