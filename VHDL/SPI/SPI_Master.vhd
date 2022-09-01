@@ -1,4 +1,4 @@
--- AUTHOR        : EGEMEN CAN AYDUÐAN
+-- AUTHOR        : EGEMEN CAN AYDUÃAN
 -- CREATED       : 30.08.2022
 -- REVISION DATE : 30.08.2022
 
@@ -137,7 +137,7 @@ P_MAIN : process (Clk) begin
                 end if;
                 
             when S_Transfer =>
-                Out_CS   <= '1';
+                Out_CS   <= '0';
                 Out_MOSI <= S_Write_Register(7);
                 
                 if (C_CPHA = '1') then
