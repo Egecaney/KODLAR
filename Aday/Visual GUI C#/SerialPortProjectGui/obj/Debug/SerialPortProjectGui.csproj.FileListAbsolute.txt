@@ -1,0 +1,9 @@
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\bin\Debug\SerialPortProjectGui.exe.config
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\bin\Debug\SerialPortProjectGui.exe
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\bin\Debug\SerialPortProjectGui.pdb
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.csprojAssemblyReference.cache
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.Form1.resources
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.Properties.Resources.resources
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.csproj.GenerateResource.cache
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.exe
+C:\Users\canaydugan\Desktop\VS_Repo\SerialPortProjectGui\SerialPortProjectGui\obj\Debug\SerialPortProjectGui.pdb
