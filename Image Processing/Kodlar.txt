@@ -1,0 +1,233 @@
+"""" # Tracker ile Nesne Takibi
+cap = cv2.VideoCapture(0)
+#tracker = cv2.legacy.TrackerMOSSE_create()
+tracker = cv2.TrackerCSRT_create()
+success,image = cap.read()
+b_box = cv2.selectROI("Tracking",image,False)
+tracker.init(image,b_box)
+
+def drawBox(image,b_box):
+    x,y,w,h = int(b_box[0]),int(b_box[1]),int(b_box[2]),int(b_box[3])
+    cv2.rectangle(image,(x,y),(x+w,y+h),(0,0,255),3,1)
+    cv2.putText(image,"Tracking",(50,75),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,0))
+
+
+
+while True:
+    #timer =cv2.getTickCount()
+    success,image = cap.read()
+
+    success,b_box = tracker.update(image)
+    print(type(b_box),b_box)
+
+
+    if success:
+        drawBox(image,b_box)
+    else:
+        cv2.putText(image,"Lost", (50, 75), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 0))
+
+    #fps = cv2.getTickFrequency()/(cv2.getTickCount()-timer)
+    #cv2.putText(image,str(int(fps)),(50,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,0))
+    cv2.imshow("Tracking",image)
+
+    if (cv2.waitKey(1) & 0xFF == 27):
+        print("Image has been finished.")
+        break
+"""
+
+
+""" Batu'nun Kodu
+
+cap = cv2.VideoCapture(0)
+
+#cap.set(3, 1280)
+#cap.set(4,720)
+#output = cap.copy()
+#height, width = cap.shape[:2]
+#maxWidth = int(width/10)
+#minWidth = int(width/20)
+
+while(True):
+    # Capture frame-by-frameq
+    ret, frame = cap.read()
+
+    # Our operations on the frame come here
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    graycopy = gray.copy()
+    nouse, thresh_global = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    thresh_mean = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    thresh_gaussian = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+    names = ['Original Image', 'Global Thresholding', 'Adaptive Mean Threshold', 'Adaptive Gaussian Thresholding']
+    images = [gray, thresh_global, thresh_mean, thresh_gaussian]
+    
+    for i in range(4):
+        plt.subplot(2, 2, i + 1), plt.imshow(images[i], 'gray')
+        plt.title(names[i])
+        plt.xticks([]), plt.yticks([])
+
+
+    plt.show()
+
+    output = graycopy.copy()
+    cv2.imshow("OUTPUT IMAGE", output)
+    height, width = thresh_mean.shape[:2]
+    maxWidth = int(width/10)
+    minWidth = int(width/20)
+
+    circles = cv2.HoughCircles(graycopy, cv2.HOUGH_GRADIENT, 1.2, 20, param1=200, param2=100, minRadius=minWidth,maxRadius=maxWidth)
+
+    if circles is not None:
+        # convert the (x, y) coordinates and radius of the circles to integers
+        circlesRound = np.round(circles[0, :]).astype("int")
+        # loop over the (x, y) coordinates and radius of the circles
+        for (x, y, r) in circlesRound:
+            cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+            print("x: ",x," y: ",y)
+            break
+
+    else:
+        print('No circles found')
+    cv2.imshow('frame',thresh_mean)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+"""
+
+""" Renk Takibi
+video_file = ''  # ''ab03.mp4'  # if given frames are read from file
+WIDTH = 800  # width of the windows
+NO_OF_POINTS = 50
+# ONLY_MAX = False  # if True only the max circle is drawn
+GREEN_RANGE = ((29, 86, 6), (64, 255, 255))
+RED_RANGE = ((139, 0, 0), (255, 160, 122))
+BLUE_RANGE = ((110, 50, 50), (130, 255, 255))
+ORANGE_RANGE = ((160, 100, 47), (179, 255, 255))
+YELLOW_RANGE = ((10, 100, 100), (40, 255, 255))
+
+colorLower, colorUpper = GREEN_RANGE  # select color range
+
+if len(video_file) == 0:
+    kamera = cv2.VideoCapture(0)  # default web camera=0
+else:
+    kamera = cv2.VideoCapture(video_file)  # read from file
+
+pts = deque(maxlen=NO_OF_POINTS)
+cv2.namedWindow('frame')
+cv2.moveWindow('frame', 10, 10)  # 'frame' window position
+# cv2.namedWindow('mask')
+# cv2.moveWindow('mask', WIDTH + 50, 10)  # 'mask' window position
+while True:
+    (ok, frame) = kamera.read()
+
+    # if filename is given but frames cannot be read then exit
+    if len(video_file) > 0 and not ok:
+        break
+
+    frame = imutils.resize(frame, WIDTH)
+    hsv = cv2.GaussianBlur(frame, (25, 25), 0)
+    hsv = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)
+
+    mask = cv2.inRange(hsv, colorLower, colorUpper)
+    mask = cv2.erode(mask, None, iterations=3)
+    mask = cv2.dilate(mask, None, iterations=3)
+    mask_copy = mask.copy()
+
+    contours = cv2.findContours(mask_copy, cv2.RETR_EXTERNAL,
+                                cv2.CHAIN_APPROX_SIMPLE)[-2]
+    center = None
+
+    if len(contours) > 0:
+        cmax = max(contours, key=cv2.contourArea)
+        for ctr in contours:
+            (x, y), radius = cv2.minEnclosingCircle(cmax)
+            mts = cv2.moments(cmax)
+            center = int(mts['m10'] / mts['m00']), int(mts['m01'] / mts['m00'])
+            if radius >= 40:  # draw circle if radius>40 px
+                cv2.circle(frame, (int(x), int(y)),
+                           int(radius), (255, 255, 0), 4)
+            pts.appendleft(center)
+            # draw tracked points in deque
+            for i in range(1, len(pts)):
+                if pts[i] and pts[i - 1]:
+                    # thickness=3
+                    thickness = int(np.sqrt(NO_OF_POINTS / float(i + 1)) * 1.1)
+                    cv2.line(frame, pts[i - 1], pts[i], (0, 255, 255), thickness)
+
+    cv2.imshow("frame", frame)
+    # cv2.imshow("mask", mask)
+
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or key == 27:
+        break
+
+# release all objects and free memory
+kamera.release()
+cv2.destroyAllWindows()
+"""
+
+""" Shape Detection (İmage)
+# reading image
+img = cv2.imread('shapes.png')
+
+
+# converting image into grayscale image
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# setting threshold of gray image
+_, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+# using a findContours() function
+contours, _ = cv2.findContours(
+    threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+i = 0
+
+# list for storing names of shapes
+for contour in contours:
+
+    # here we are ignoring first counter because
+    # findcontour function detects whole image as shape
+    if i == 0:
+        i = 1
+        continue
+
+    # cv2.approxPloyDP() function to approximate the shape
+    approx = cv2.approxPolyDP(
+        contour, 0.01 * cv2.arcLength(contour, True), True)
+
+    # using drawContours() function
+    cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
+
+    # finding center point of shape
+    M = cv2.moments(contour)
+    if M['m00'] != 0.0:
+        x = int(M['m10'] / M['m00'])
+        y = int(M['m01'] / M['m00'])
+
+    # putting shape name at center of each shape
+    if len(approx) == 3:
+        cv2.putText(img, 'Triangle', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 2)
+
+    elif len(approx) == 4:
+        cv2.putText(img, 'Quadrilateral', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 2)
+
+    elif len(approx) == 5:
+        cv2.putText(img, 'Pentagon', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 2)
+
+    elif len(approx) == 6:
+        cv2.putText(img, 'Hexagon', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 2)
+
+    else:
+        cv2.putText(img, 'circle', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 2)
+
+# displaying the image after drawing contours
+cv2.imshow('shapes', img)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+"""

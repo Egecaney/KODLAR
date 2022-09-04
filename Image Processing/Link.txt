@@ -1,0 +1,3 @@
+https://www.geeksforgeeks.org/opencv-python-tutorial/
+https://www.geeksforgeeks.org/how-to-detect-shapes-in-images-in-python-using-opencv/
+https://docs.opencv.org/4.x/dd/d49/tutorial_py_contour_features.html
