@@ -1,184 +1,298 @@
-from cv2 import cv2
-import numpy as np
-import serial
-import time
-from serial import Serial
 
-ArduinoSerial = serial.Serial(port='COM6', baudrate=115200, timeout=.01)
+""" Lecture 2 """
+""" Prime Numbers
+def PrimeNumberorNot(Number):
+    PrimeControl = 0
+    if (Number > 1):
+        for i in range(2, Number):
+            if (Number % i == 0):
+                PrimeControl = 1
+        return (PrimeControl)
 
-""" 09.03.2022 BİRDEN FAZLA ÇEMBERİ HAFIZADA TUTAN KODUN SON HALİ. BUNDAN SONRA TEKLİYE GERİ DÖNÜLDÜ"""
-""" KULLANILAN FONKSIYONLAR """
+def FindPrimeNumbers(Number):
+    for i in range(2,Number):
+        PrimeOrder = PrimeNumberorNot(i)
+        if PrimeOrder == 0:
+            print(i)
 
-def PutTargetInfo(VideoFrame, x, y, r):
+Number = int(input("Enter a positive number: "))
+PrimeorNot = PrimeNumberorNot(Number)
+if PrimeorNot == 0:
+    print(Number,"is Prime Number.")
+else:
+    print(Number,"is not Prime Number.")
 
-    """ Tespit edilen cemberi ve bilgilerini bastirir """
+print("All Prime Numbers in Region: ")
+FindPrimeNumbers(Number)
+"""
 
-    HedefBilgisix = " ".join(["x:", str(x)])
-    HedefBilgisiy = " ".join(["y:", str(y)])
-    HedefBilgisir = " ".join(["r:", str(r)])
+""" Fahrenheit TO Centigrade (With Fuction)
+def FahrenheittoCentigrade(Fahrenheit):
+    Celcius = (Fahrenheit-32)*5/9
+    return Celcius
 
-    cv2.circle(VideoFrame, (x, y), r, (0, 255, 0), 4)
-    cv2.rectangle(VideoFrame, (x - 5, y - 5), (x + 5, y + 5), (0, 0, 255), -1)
-    cv2.putText(VideoFrame, HedefBilgisix, (x + r, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0,), 2,
-                cv2.LINE_AA)
-    cv2.putText(VideoFrame, HedefBilgisiy, (x + r, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0,), 2,
-                cv2.LINE_AA)
-    cv2.putText(VideoFrame, HedefBilgisir, (x + r, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0,), 2,
-                cv2.LINE_AA)
+print("Output:\nFahrenheit(F)  Centigrade(C)")
+for Fahrenheit in [-40, 0, 32, 68, 98.6, 212]:
+    Celcius = FahrenheittoCentigrade(Fahrenheit)
+    print("   ","{0:.2f}".format(Fahrenheit),"        ", "{0:.2f}".format(Celcius))
+print("All Done!")
+"""
 
-def RemoveNoise_Filter(VideoFrame):
+"""
+Name = ['Egemen Can','Eren Yağız','Ozan']
+Surname = ['Ayduğan','Tumbul','Coşgun']
+for i in range(len(Name)):
+    print("Name Surname: ",Name[i],Surname[i])
+print("All Done!")
+"""
 
-    """ Tüm filtreleme & noise azaltma islemleri burda yapilir """
+""" Divisors
+def findDivisors (n1, n2):
+    # Assumes n1 and n2 are positive ints Returns a tuple containing all common divisors of n1 & n2
+    divisors = ()  # the empty tuple
+    for i in range(1, min(n1, n2) + 1):
+        if n1 % i == 0 and n2 % i == 0:
+            divisors = divisors + (i,)
+            # print(divisors,i)
+    return divisors
 
-    # denoise = cv2.fastNlMeansDenoisingColored(frame, None, 10, 10, 1, 3)
-    gray = cv2.cvtColor(VideoFrame, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (5, 5), 0)
-    gray = cv2.medianBlur(gray, 5)
-    # gray = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 3.5)
-    # gray = cv2.Canny(gray, 10, 20)
-    kernel = np.zeros((3, 3), np.uint8)
-
-    gray = cv2.dilate(gray, kernel, iterations=2)  # dilate'in iteration'ının erode'dan fazla olması menzili artırdı gibi.
-    gray = cv2.erode(gray, kernel, iterations=1)
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
-    gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
-    gray = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    gray_final = cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, kernel)
-
-    return gray_final
-
-def ArduinoCordinatesXY(x,y):
-
-    if x < 300 and y < 220:
-        ArduinoSerial.write('1'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("1. Region","Return Data:",ReturnData)
-    elif x > 340 and y < 220:
-        ArduinoSerial.write('2'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("2. Region","Return Data:",ReturnData)
-    elif x < 300 and y > 260:
-        ArduinoSerial.write('3'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("3. Region","Return Data:",ReturnData)
-    elif x > 340 and y > 260:
-        ArduinoSerial.write('4'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("4. Region","Return Data:",ReturnData)
-    elif x<300 and (y>= 220 and y<=260):
-        ArduinoSerial.write('5'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("5. Region","Return Data:",ReturnData)
-    elif (x>=300 and x<= 340) and y<220:
-        ArduinoSerial.write('6'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("6. Region","Return Data:",ReturnData)
-    elif x > 340 and (y >= 220 and y <= 260):
-        ArduinoSerial.write('7'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("7. Region","Return Data:",ReturnData)
-    elif (x>=300 and x<= 340) and y>260:
-        ArduinoSerial.write('8'.encode())
-        # ReturnData = ArduinoSerial.readline()
-        # print("8. Region","Return Data:",ReturnData)
-
-    # ReturnData = ArduinoSerial.readline()
-    # print("x:", x, "y:", y, "r:", r)
+divisors = findDivisors(20, 100)
+print(divisors)
+total = 0
+for d in divisors:
+    total += d
+print(total)
+"""
 
 
-""" Must global variables. """
-
-x1, y1, TrackCounter, MemoryIterator = 0, 0, 0, 0
-StepCounter = 0
-CircleMemory = [0, 0, 0]
 
 
-""" Initializing camera. """
-
-cap = cv2.VideoCapture(1)
-# cap.set(3,1280)
-# cap.set(4,720)
-
-while True:
-
-    ret, frame = cap.read()
-
-    FilteredFrame = RemoveNoise_Filter(frame)
-
-    circles = cv2.HoughCircles(FilteredFrame, cv2.HOUGH_GRADIENT, 1.0, 90, param1=60, param2=65, minRadius=3, maxRadius=70)
 
 
-    if circles is not None:
 
-        circles = np.round(circles[0, :]).astype("int")
 
-        detected_circle = 0
-        StepCounter = 0
 
-        for (x, y, r) in circles:
+""" Lecture 3 """
+""" List Insertion
+list1 = [1,2,3]
+list2 = [10,20]
+list1.append(4)
+print(list1)                    #[1,2,3,4]
+list1.append(5)
+print(list1)                    #[1,2,3,4,5]
+list1.insert(2,10)
+print(list1)                    #[1,2,10,3,4,5]
+list1.extend(list2)
+print(list1)                    #[1,2,10,3,4,5,10,20]
+list1.append(list2)
+print(list1)                    #[1,2,10,3,4,5,10,20,[10,20]]
+print(list1[7]*list2[1])        # 20*20 = 400
+print(list1[8][0],list1[8][1])  # 10,20
+list1.remove(3)
+print(list1)                    #[1,2,10,4,5,10,20,[10,20]]
+list1.pop()
+print(list1)                    #[1,2,10,4,5,10,20]
+list1.pop()
+print(list1)                    #[1,2,10,4,5,10]
+list1.pop(3)
+print(list1)                    #[1,2,10,5,10]
+list1[len(list1)-1] = 0
+print(list1)                    #[1,2,10,5,0]
+list1[1:2] = list2
+print(list1)                    #[1,10,20,10,5,0]
+list1[1:3] = list2
+print(list1)                    #[1,10,20,10,5,0]
+list1[1:4] = list2
+print(list1)                    #[1,10,20,5,0]
+list2 = list1
+list1[1:3] = list2
+print(list1)                    #[1,1,10,20,5,0,5,0]
+list2[3:7] = []
+print(list1,list2)              #[1,1,10,0] [1,1,10,0]
+list2 = [5,6]
+print(list1,list2)              #[1,1,10,0] [5,6]
+"""
+""" Ternary Assignment
+the_list = []
+for i in range(16):
+    the_list.append('even' if i % 2 == 0 else 'odd')
+print(the_list)
+# the_list = ['even' if i%2 == 0 else 'odd' for i in range(16)]
+"""
 
-            HedefBilgisix = " ".join(["x:", str(x)])
-            HedefBilgisiy = " ".join(["y:", str(y)])
-            HedefBilgisir = " ".join(["r:", str(r)])
 
-            if (x1 - 5 < circles[0][0] < x1 + 5) and (y1 - 5 < circles[0][1] < y1 + 5):
 
-                # CISIM HAREKET ETMIYORSA (YANI X, Y KOORDINATLARI +-5 PIXELDEN FAZLA OYNAMAMIS ISE) BU BLOGA GIRER
 
-                TrackCounter += 1
 
-                if TrackCounter < 5:
-                    # CISIM 20 KEZ YUKARDAKI IF BLOGUNA GIRENE KADAR CISIM TAKIP EDILIR
-                    ArduinoCordinatesXY(x,y)
-                    detected_circle = 1
-                    PutTargetInfo(frame, x, y, r)
-                    # print("x:", x, " y:", y, " r:", r)
-                    if detected_circle == 1:
-                        break
 
-                else:
-                    PutTargetInfo(frame, x, y, r)
-                    cv2.putText(frame, "Object is locked", (x + r, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0,), 2, cv2.LINE_AA)
 
-                    # CISIM DURDUGUNU ARDUINO'YA ILETIR, ARDUİNO PYTHON'A UZAKLIK BİLGİSİNİ GÖNDERİR.
-                    ArduinoSerial.write('S'.encode())
-                    SonarDistance = ArduinoSerial.readline()  #Cismin Uzaklığı
-                    # print("Sonar Distance: ",SonarDistance)
 
-                    # CISIM 20 KEZ IF BLOGUNA GIRDIGINDE ARTIK CISMIN DURDUGUNA KARAR VERILIR VE ARTIK TAKIP EDILMEZ
-                    # print("Object is stopped.")
 
-            else:
-                #CISIM HAREKETLIYSE YANI PIXELLERI ONCEKI KAREYE GORE +-5 PIXELDEN FAZLA OYNADIYSA NORMAL BIR SEKILDE TAKIP EDILIR
 
-                ArduinoCordinatesXY(x, y)
-                detected_circle = 1
-                PutTargetInfo(frame,x, y, r)
-                # print("x:", x, " y:", y, " r:", r)
+"""Tuples
+t1 = (1,'two',3)
+t2 = (t1,3.25)
+print(t2)                 # ((1,'two',3),3.25)
+print((t1+t2))            # (1,'two',3,(1,'two',3),3.25)
+print((t1+t2)[3])         # (1,'two',3)
+print((t1+t2)[2])         # 3
+print((t1+t2)[2:4])       # (3,(1,'two',3))
+print((t1+t2)[2:5])       # (3,(1,'two',3),3.25)
+"""
 
-                TrackCounter = 0
-                if detected_circle == 1:
-                    break
 
-        x1 = x
-        y1 = y
+
+
+
+
+
+
+
+
+""" Lecture 4 """
+""" File Input Output
+# Open Modes
+# r = open for read (default)
+# w = open for write, truncate
+# r+ = open for read/write
+# w+ = open for read/write, truncate
+# a+ = open for read/append
+
+# Reading Files
+TxtFile = open('Name.txt')
+for Line in TxtFile:
+    for Word in Line.split():
+        print(Word.strip('.,'))
+
+with open('Name.Txt') as Txt:
+    for line in Txt:
+        for word in line.split():
+            print(word.strip('.,'))
+
+# Total Words in File
+MyFile = open("Name.txt")
+NumWords = 0
+for LineofText in MyFile:
+    WordList = LineofText.split()
+    NumWords += len(WordList)
+MyFile.close()
+print("Total Words in File: ",NumWords)
+
+# Writing Files
+OpenFiles = open('Name.txt','w')
+OpenFiles.write('Turtles\n')
+OpenFiles.write('Goat(Messi)\n')
+OpenFiles.close()
+
+OpenFiles = open('Name.txt','r')
+for Animal in OpenFiles:
+    print(Animal,end='')
+OpenFiles.close()
+
+NameHandle = open('Name.txt','a')
+NameHandle.write('Rick and Morty\n')
+NameHandle.write('ToM and Jerry\n')
+NameHandle.close()
+
+NameHandle = open('Name.txt','r')
+for ExtraLine in NameHandle:
+    print(ExtraLine[:-1])
+NameHandle.close()
+
+# Numbers
+Numbers = open('Number.txt')
+Total = 0
+People = 0
+for Lines in Numbers:
+    print(Lines.strip())
+    Student = Lines.strip()
+    Information = Student.split("-")
+    Total += int(Information[2])
+    People += 1
+
+print("Total of Exams: ",Total,"\nExam Average:",Total/People)
+"""
+
+
+
+
+
+
+
+
+""" Homework """
+""" 1. Soru
+print("Output:\nFahrenheit(F)  Centigrade(C)")
+for Fahrenheit in [-40, 0, 32, 68, 98.6, 212]:
+    Celcius = (Fahrenheit-32)*5/9
+    print("   ",Fahrenheit,"        ", "{0:.1f}".format(Celcius))
+print("All Done!")
+"""
+""" 2. Soru
+def square(x):
+    return x*x
+
+def fahr_to_cent(fahr):
+    return ((fahr-32)/9.0)*5
+
+def cent_to_fahr(cent):
+    result = (cent/5.0)*9+32
+    return result
+
+def abs(x):
+    if x<0:
+        return (-x)
     else:
-        StepCounter += 1
-        # CISIM BULUNAMADI, ARDUNIO'YA 'N' GONDEREREK STEP MOTORU HAREKET ETTIRILECEK.
-        if StepCounter > 25:
-            ArduinoSerial.write('N'.encode())
+        return (x)
+
+def print_hello():
+    print("Hello, world")
+
+def print_fahr_to_cent(fahr):
+    result = fahr_to_cent(fahr)
+    print(result)
+
+x = 42
+print(x)
+result = square(3)+square(4)
+boiling = fahr_to_cent(212)
+cold = cent_to_fahr(-40)
+print(result)
+print(abs(-22))
+print(print_fahr_to_cent(32))
+"""
+
+""" 3.Soru """
+import cv2
+import scipy
+import openpyxl
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from skimage import io,color,data
+
+# Displaying Image
+Image = io.imread("Egemen.jpg")
+
+io.imshow(Image)
+plt.show()
+
+# Getting Image Resolution
+print("Image Resolution: ",Image.shape)
+
+# Getting Pixel Values
+DataFrame = pd.DataFrame(Image.flatten())
+FilePath ='pixel_values1.xlsx'
+DataFrame.to_excel(FilePath,index=False)
+
+# Converting Color Space
+Image_HSV = color.rgb2hsv(Image)
+Image_RGB = color.hsv2rgb(Image_HSV)
+plt.figure(0)
+io.imshow(Image_HSV)
+plt.figure(1)
+io.imshow(Image_RGB)
+plt.show()
 
 
-    cv2.imshow('FilteredFrame', FilteredFrame)
-    cv2.imshow('frame', frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# When everything done, release the capture
-
-cap.release()
-cv2.destroyAllWindows()

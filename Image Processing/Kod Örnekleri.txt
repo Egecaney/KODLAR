@@ -1,0 +1,183 @@
+""" 
+#Ders1 (Resim Okuma, Yazma)
+
+image = cv2.imread("Yasin2.jpg")
+cv2.imshow("Egemen Can", image)
+
+cv2.namedWindow("Moved Image",cv2.WINDOW_NORMAL)
+cv2.imshow("Moved Image",image)
+
+pyplot.imshow(image,cmap="gray")
+pyplot.show()
+
+k = cv2.waitKey(0)
+cv2.destroyAllWindows()
+# cv2.destroyWindows("image") Tek resmi kapatır
+if (k == ord("A")):
+    print("A tuşuna basıldı ve resim kaydedildi.")
+    cv2.imwrite("Yasin2Gri.jpg", image)
+"""
+
+
+
+""""
+#DERS 2  (VİDEO AÇMA)
+
+camera = cv2.VideoCapture(0) # 1 ya da 2 yazarak başka kameralaarı aktive eder.
+print("Kamera'nın FPS'i ",camera.get(5),"fps")
+print("Width of Camera: ",camera.get(3)) 
+print("Height of Camera: ",camera.get(4))
+
+camera.set(3,960) # Kamera Ayarları
+camera.set(4,720)
+
+if not camera.isOpened():
+    print("Kamera tanınmadı.")
+    exit()
+
+while True:
+    ret,frame = camera.read() # Kamera'yı açar.
+    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)    # Siyah Beyaz yapar.
+    if not ret:
+        print("Kameradan görüntü okunmuyor.")
+        break
+
+    cv2.imshow("Kamera",frame)
+
+    if (cv2.waitKey(1) & 0xFF == ord("A")):
+        print("Görüntü Sonlandırıldı.")
+        break
+
+camera.release()
+cv2.destroyAllWindows()
+"""
+
+
+
+""" 
+#DERS3 (Şekil Çizme)
+
+image = np.zeros((512, 512, 3), np.uint8)  # (512*512)Boyut , 3 ana renk
+
+cv2.line(image,(0,0),(511,511),(0,255,0),10)  # Ad, Başlangıç noktası, Bitiş Noktası, Renk, Kalınlık
+cv2.rectangle(image,(230,230),(280,280),(255,0,0),5)
+cv2.rectangle(image,(10,460),(50,500),(0,0,255),-1)
+cv2.circle(image,(400,300),60,(200,50,50),2)
+
+polygon = numpy.array([[20,40],[100,120],[20,200]],numpy.int32)
+# polygon2 = polygon.reshape(-1,1,2)
+cv2.polylines(image,[polygon],True,(255,255,255),3) # True olunca kapalı şekil oluyor
+
+font = cv2.FONT_HERSHEY_COMPLEX
+cv2.putText(image,"Egemen Can",(300,400),font,1,(255,255,0),2,cv2.LINE_AA) # Ad, Başlangıç, Yazı Tipi, Boyut, Renk, Kalınlık
+                                                                          # LINE_AA kaliteli yazar.
+cv2.imshow("Image", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+"""
+
+
+
+""" 
+#DERS4 (Foto Kesme, Renk Değiştirme)
+
+image = cv2.imread("Yasin2.jpg",cv2.IMREAD_COLOR)
+
+print(image[55,55]) #Pikselin Rengi
+image[55,55] = [255,255,255]
+print(image[55,55]) #Piksel Renki Değişti
+
+regionOfImage = image[100:150,100:150]
+# print(regionOfImage)
+image[100:120,100:140] = [255,255,0]
+
+Yasin_Face = image[10:100,10:90]
+image[0:90,0:80] = Yasin_Face  # Aynı boyutta olmak zorundalar.
+
+cv2.imshow("Hiko Baba", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+"""
+
+
+
+""""
+# DERS5 (Görüntü Aritmetiği)
+
+image1 = cv2.imread("Logo.jpg")
+image2 = cv2.imread("Eyes.jpg")
+
+# addImages = image1+image2
+# add_Images = cv2.add(image2,image1)  # Fotoğraftaki pikselleri toplar. Tek bir Matrix yapar.
+# add_ImagesWeighted = cv2.addWeighted(image1,0.3,image2,0.7,0)
+# cv2.imshow("Added Eyes",add_ImagesWeighted)
+
+rows, columns , channels = image1.shape  #İmage1'in kaç satır,sütün olduğunu basar.
+regionOfImage = image2[0:rows,0:columns]
+print(regionOfImage)
+
+image1Gray = cv2.cvtColor(image1,cv2.COLOR_BGR2GRAY) #İmage1'i Gri yapar.
+ret, mask = cv2.threshold(image1Gray,220,255,cv2.THRESH_BINARY_INV) #Threshold Value=220, Eğer piksel renk değeri 220'den fazla ise bunu 255 yapar.
+
+mask_inv = cv2.bitwise_not(mask) #İnverter aldı.
+img2_bg = cv2.bitwise_and(regionOfImage,regionOfImage,mask = mask_inv)
+
+img1_fg = cv2.bitwise_and(image1,image1,mask=mask) # Logo'daki beyaz yerleri siyah yaptı.
+
+dst = cv2.add(img2_bg,img1_fg)  # Logo'nun kendisi oldu.
+image1[0:rows,0:columns] = dst
+
+#cv2.imshow("DST ", dst)
+#v2.waitKey(0)
+#cv2.destroyAllWindows()
+"""
+
+
+
+"""
+#DERS6 (THRESHOLDİNG)
+
+image = cv2.imread("Bookpage.jpg")
+
+retval, threshold = cv2.threshold(image,12,255,cv2.THRESH_BINARY)
+cv2.imshow("First Threshold",threshold)
+
+grayscaled = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+retval2, threshold2 = cv2.threshold(grayscaled,12,255,cv2.THRESH_BINARY)
+cv2.imshow("Second Thereshold",threshold2)
+
+gaussian = cv2.adaptiveThreshold(grayscaled,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
+cv2.imshow("Gaussian",gaussian)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+"""
+
+""""
+#DERS7 (Videoda Renk Yakalama)
+
+camera = cv2.VideoCapture(0)
+while True:
+    ret,frame = camera.read()
+    hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+
+    lower_red = np.array([160,50,50])   # H-S-V
+    upper_red = np.array([180,255,255])
+
+    mask = cv2.inRange(hsv,lower_red,upper_red)
+    res = cv2.bitwise_and(frame,frame,mask=mask)
+    mask_3 = cv2.cvtColor(mask,cv2.COLOR_GRAY2BGR)
+    median = cv2.medianBlur(res,15)
+
+
+    cv2.imshow("ResultGray",mask_3)
+    cv2.imshow("Result", res)
+    cv2.imshow("Camera",frame)
+    cv2.imshow("Median",median)
+
+    if cv2.waitKey(1) & 0xFF == 27 :
+        break
+
+camera.release()
+cv2.destroyAllWindows()
+"""
