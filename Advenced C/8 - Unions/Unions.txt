@@ -1,0 +1,45 @@
+
+	Unions:
+	
+		A union is a derived type (similiar to a structure) with members that share the same storage space
+			- sometimes the same type of construct needs different types of data
+			
+		Used mainly in advenced programming applications where it is necessary to store differenttypes of data in the same storage area
+			- can be used to save space and for alternating data
+			- a union does not waste storage on variables that are not being used
+			
+		Each element in a union is called members
+		
+		You can define a union with many members
+			- only one member can contain a value at any given time, so only one access of a member at a given time
+			
+		The members of a union can be of any data type
+			- ın most cases, unions contain two or more data types
+
+		It is your responsibility to ensure that the data in a union is referenced with the proper data type
+			- referencing data in a union with a variable of the wrong type is a logic error
+			
+		Unions are particularly useful in embedded programming
+			- situations where direct access to the hardware/memory is needed
+			
+		
+				STRUCTURE							UNIONS
+			struct __Emp{						union Emp{
+				char X;	 // size 1 byte				char X;
+				float Y; // size 4 bytes			float Y;
+			}Emp;								}Emp;
+			
+			Emp -> Structure Variable			Emp -> Union Variable
+				   5 bytes							   4 bytes
+													   Memory sharing
+													   Allocates storage equal to largest one
+													   
+		You should use a structure when your construct should be a group of the other things
+		You should use a union when your construct can be one of many different things but only one at a time.
+		
+		For structure, individual member can be accessed at a time.
+		For unions, only one member can be accessed at a time.
+		
+		For structure, several members of a structure can initialize at once.
+		For unions, only the first member of a union can be initialized.
+		

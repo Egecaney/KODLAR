@@ -1,0 +1,33 @@
+
+	1. The volatile type qualifier tells the compoiler explicitly that the specified variable will change its value
+	
+	2. It is provided so that a program can tell the compiler to suppress various kinds of optimizations
+		- prevents the compiler from OPTIMIZING away seemingly redundant assignments to a variable
+		- prevents the compiler from REPEATED examination of a variable without its value seemingly changing
+		
+	3. Essentially, prevents the compiler from "caching" variables
+	
+	4. The reason for having this type qualifier is mainly because of the problems that are encountered in real-time or embedded systems programming
+		- programs that have a lot of threading
+		- programs where resources are scarce
+	
+	5. Only three types of variables should use volatile
+		- Memory-mapped peripheral registers
+		- Global variables (non stack variables) modified by an interrupt service routine
+		- Global variables accessed by multiple tasks within a multi-threaded application
+		
+	SYNTAX:
+		volatile int Loc;		/* Loc is a volatile location , Loc is a volatile value*/
+		volatile int *PLoc;		/* PLoc points to a volatile location, PLoc points to a volatile value*/
+
+	6. Using volatile with const
+		- A Value can be both const and volatile
+		- A hardware clock setting normally should not be changed by the program (Make it const)
+		- However, it is changed byan agency other than the program (Make it volatile)
+		- Use both qualifiers in the declaration (order does not matter)
+		
+		volatile const int Loc;
+		const volatile int *PLoc;
+		
+		
+		

@@ -1,0 +1,16 @@
+
+	Quiz
+		1. One of the major differences between typedef and #define is that
+			a typedef interpretation is performed by the COMPILER where as
+			a #define interpretation is performed by the PRE-PROCESSOR
+			
+		2.  DESIGNATED INITIALIZERS aloow us to initialize elements of an array explicity by using a subscript.
+		
+		3.  An array whose length is defined in terms of a value determined at execution time is a VARIABLE-LENGTH ARRAY.
+		
+		4. The keyword typedef is used to define a new data type (False)
+			Typedef provides an alias for a pre-defined type
+			
+	TERA TERM COLOR COMMANDS
+		#define CLI_BLACK           (char*)"\033[30m"
+		#define CLI_RED             (char*)"\033[31m"
