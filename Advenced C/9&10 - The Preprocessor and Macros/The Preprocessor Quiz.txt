@@ -1,0 +1,81 @@
+	
+	1. What is a preprocessor?
+		A program that processes its input data to produce output that is used as input to another program
+		
+	2. The C preprocessor is the first step of the compiliation process
+		TRUE
+		
+	3. The C preprocessor may have compiler specific features
+		TRUE
+		
+	4. Every preprocessor directive must begin with a  __________.
+		pound sign (#)
+		
+	5. Only __________ characters may appear before a preprocessor directive on a line.
+		Whitespace
+		
+	6. __________ allows a programmer to produce different executables (code) for different platforms.
+		Conditional Compilation
+		
+	7. Which of the following are C preprocessors directives that allow for Conditional Compiliation?
+		#ifdef, #define, #endif
+		
+	8. This preprocessor directive checks whether a constant expression results in a zero or non-zero value.
+		#if
+		
+	9. This preprocessor directive is used to remove the definition of an identifier which was previously defined with #define?
+		#undef
+		
+	10. Write some code that will print out your name if the  identifier MY_NAME is defined
+		#ifdef MY_NAME
+			printf("My name is Jason\n");
+		#endif
+		
+	11. The __________ and __________ directives allow a program to extend the #if and #ifdef/#ifndef directives to test for multiple cases
+		#elif, #else
+	
+	12. What will be the output of the following program?
+			#include <stdio.h>
+			#define SWAP
+	 
+			int main()  {
+				int x = 3, y = 5;
+				#ifdef SWAP
+					x = 5;
+					y = 3;
+				#endif
+			printf("%d, %d", x, y);
+			}
+
+		Result: 5, 3
+		
+	13.What will be the output of the following program?
+			#include<stdio.h>
+ 
+			#define TEXT
+ 
+			void main() {
+				#ifndef TEXT
+					printf("hello");
+				#else
+					printf("hi");
+				#endif
+			}
+			
+		Result: hi
+		
+	14. This preprocessor directive is used to give additional information to the compiler, beyond which is provided in the language
+		#pragma
+		
+	15. This pragma is used to remove an identifier completely from a program.
+		GCC poison
+	
+	16. The purpose of using the preprocessor directive #error is that ____________
+		It causes the preprocessor to report a fatal error
+
+
+
+
+
+
+	
